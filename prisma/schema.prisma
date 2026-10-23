@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+
+model Product {
+  id           String        @id @default(cuid())
+  name         String
+  quantity     Int           @default(0) // in stock
+  mrp          Float
+  price1       Float
+  price2       Float
+  price3       Float
+  createdAt    DateTime      @default(now())
+  purchases    Purchase[]
+  saleItems    SaleItem[]
+  salesReturns SalesReturn[]
+}
+
+model Purchase {
+  id            String   @id @default(cuid())
+  productId     String
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantityAdded Int
+  purchasePrice Float
+  createdAt     DateTime @default(now())
+}
+
+model Sale {
+  id            String        @id @default(cuid())
+  saleNumber    String        @unique
+  customerName  String?
+  customerPhone String?
+  totalAmount   Float
+  createdAt     DateTime      @default(now())
+  items         SaleItem[]
+  salesReturns  SalesReturn[]
+}
+
+model SaleItem {
+  id            String  @id @default(cuid())
+  saleId        String
+  sale          Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  productId     String
+  product       Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantity      Int
+  selectedPrice Float   // numeric value of price1/price2/price3 chosen
+  subtotal      Float
+}
+
+model SalesReturn {
+  id               String   @id @default(cuid())
+  saleId           String
+  sale             Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  productId        String
+  product          Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantityReturned Int
+  createdAt        DateTime @default(now())
+}

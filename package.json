@@ -1,0 +1,100 @@
+{
+  "name": "fastbill",
+  "version": "1.0.0",
+  "private": true,
+  "main": "main.js",
+
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build --no-lint",
+    "start": "next start",
+    "lint": "next lint",
+    "postinstall": "prisma generate",
+    "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:3000 && electron .\"",
+    "prebuild:electron": "npm run build && npx prisma generate",
+    "dist": "npm run prebuild:electron && node scripts/prepare-electron.js && npx electron-builder --win"
+  },
+  "dependencies": {
+    "@next/swc-win32-x64-msvc": "14.2.33",
+    "@prisma/client": "^5.22.0",
+    "next": "14.2.33",
+    "react": "^18",
+    "react-dom": "^18"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "concurrently": "^10.0.6",
+    "electron": "^44.9.1",
+    "electron-builder": "^26.15.3",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.33",
+    "postcss": "^8",
+    "prisma": "^5.22.0",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5",
+    "wait-on": "^9.5.1"
+  },
+  "build": {
+    "appId": "com.fastbill.app",
+    "productName": "Fastbill",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "package.json",
+      "node_modules/.prisma/**/*",
+      "node_modules/@prisma/client/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": ".next/standalone",
+        "to": "standalone",
+        "filter": ["**/*"]
+      },
+      {
+        "from": ".next/static",
+        "to": "standalone/.next/static",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "public",
+        "to": "standalone/public",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "prisma",
+        "to": "prisma",
+        "filter": ["schema.prisma"]
+      },
+      {
+        "from": "node_modules/.prisma",
+        "to": "prisma-engines",
+        "filter": ["**/*.node", "**/*.dll"]
+      }
+    ],
+    "asarUnpack": [
+      "node_modules/.prisma/**/*",
+      "node_modules/@prisma/client/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": null
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Fastbill"
+    }
+  }
+}
